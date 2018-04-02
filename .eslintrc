@@ -6,7 +6,7 @@
   "parserOptions": {
     
     "ecmaVersion": 6,
-    
+    "allowImportExportEverywhere": true,
     "sourceType": "module",
     "ecmaFeatures": {
       
@@ -14,11 +14,15 @@
      
       "experimentalObjectRestSpread": true
     }
+
   },
 
   "parser": "babel-eslint",
   "plugins": ["prettier"],
   "rules": {
+    "import/no-extraneous-dependencies": [ "error", {
+      "devDependencies": true
+    }],
     "prettier/prettier": [
       "error",
       {
