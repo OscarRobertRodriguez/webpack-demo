@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[4],{1:function(n,t,e){"use strict";e.r(t);e(8),e(7);var o=function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"Hello World",t=document.createElement("div");return t.className="pure-button",t.innerHTML=n,t.onclick=function(){return e.e(0).then(e.bind(null,0)).then(function(n){t.textContent=n.default}).catch(function(n){console.error(n)})},t}("Another");document.body.appendChild(o)},7:function(n,t){},8:function(n,t){}},[[1,1]]]);
+//# sourceMappingURL=another.618d.js.map
