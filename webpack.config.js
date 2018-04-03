@@ -1,4 +1,3 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SystemBellPlugin = require('system-bell-webpack-plugin');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
@@ -16,10 +15,6 @@ const PATHS = {
 const commonConfig = merge([
   {
     plugins: [
-      new HtmlWebpackPlugin({
-        title: 'webpack demo',
-        template: './src/index.html',
-      }),
       new SystemBellPlugin(),
       new WebpackNotifierPlugin(),
       new FriendlyErrorsWebpackPlugin(),
@@ -30,8 +25,23 @@ const commonConfig = merge([
 ]);
 
 const productionConfig = merge([
+  {
+    output: {
+      publicPath: '/webpack-demo/',
+      chunkFilename: '[name].[chunkhash:4].js',
+      filename: '[name].[chunkhash:4].js',
+    },
+    recordsPath: path.join(__dirname, 'records.json'),
+  },
   parts.clean(PATHS.build),
   parts.extractCSS({ use: ['css-loader', parts.autoprefix()] }),
+  parts.minifyCSS({
+    options: {
+      discardComments: {
+        removeAll: true,
+      },
+    },
+  }),
   parts.loadFonts({
     options: {
       limit: 50000,
@@ -41,8 +51,8 @@ const productionConfig = merge([
   }),
   parts.loadImages({
     options: {
-      limit: 150,
-      name: './images/[name].[ext]',
+      limit: 15000,
+      name: './images/[name].[hash:4].[ext]',
     },
   }),
   parts.purifyCSS({
@@ -57,6 +67,9 @@ const productionConfig = merge([
     optimization: {
       splitChunks: {
         chunks: 'initial',
+      },
+      runtimeChunk: {
+        name: 'manifest',
       },
     },
   },
@@ -77,8 +90,20 @@ const developmentConfig = merge([
 ]);
 
 module.exports = mode => {
-  if (mode === 'production') {
-    return merge(commonConfig, productionConfig, { mode });
-  }
-  return merge(commonConfig, developmentConfig, { mode });
+  const pages = [
+    parts.page({ title: 'Webpack demo ', entry: { app: PATHS.app } }),
+    parts.page({
+      title: 'Another demo',
+      path: 'another',
+      entry: {
+        another: path.join(PATHS.app, 'another.js'),
+      },
+    }),
+  ];
+  const config = mode === 'production' ? productionConfig : developmentConfig;
+  return pages.map(page => merge(commonConfig, config, page, { mode }));
 };
+// if (mode === 'production') {
+//   return merge(commonConfig, productionConfig, { mode });
+// }
+// return merge(commonConfig, developmentConfig, { mode });

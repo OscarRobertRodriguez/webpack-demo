@@ -2,6 +2,9 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack');
 const autoprefixer = require('autoprefixer');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const cssnano = require('cssnano');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports.devServer = ({ host, port } = {}) => ({
   devServer: {
@@ -16,7 +19,7 @@ module.exports.devServer = ({ host, port } = {}) => ({
 module.exports.extractCSS = ({ include, exclude, use }) => {
   const plugin = new ExtractTextPlugin({
     allChunks: true,
-    filename: '[name].css',
+    filename: '[name].[contenthash:4].css',
   });
   return {
     module: {
@@ -128,4 +131,30 @@ module.exports.generateSourceMaps = ({ type }) => ({
 
 module.exports.clean = path => ({
   plugins: [new CleanWebpackPlugin([path])],
+});
+
+module.exports.minifyCSS = ({ options }) => ({
+  plugins: [
+    new OptimizeCSSAssetsPlugin({
+      cssProcessor: cssnano,
+      cssProcessorOptions: options,
+      canPrint: false,
+    }),
+  ],
+});
+
+module.exports.page = ({
+  path = '',
+  template = require.resolve('html-webpack-plugin/default_index.ejs'),
+  title,
+  entry,
+} = {}) => ({
+  entry,
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: `${path && path}/index.html`,
+      template,
+      title,
+    }),
+  ],
 });
